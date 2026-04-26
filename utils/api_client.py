@@ -39,9 +39,9 @@ def test_connection(api_url: str, api_key: str, model_name: str) -> tuple:
         model_list = [m.id for m in models.data] if models.data else []
         model_found = model_name in model_list if model_list else True  # 有模型列表但找不到也算连通
         if model_found:
-            return True, f"连接成功，可用模型：{', '.join(model_list[:5])}{'...' if len(model_list) > 5 else ''}"
+            return True, "API 连接成功"
         else:
-            return True, f"连接成功，但未找到模型 '{model_name}'，可用模型：{', '.join(model_list[:5])}"
+            return True, f"连接成功，但未找到模型 '{model_name}'"
     except AuthenticationError:
         return False, "API Key 无效，请检查配置"
     except (APIConnectionError, APITimeoutError):
