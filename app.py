@@ -160,4 +160,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        st.error(f"应用运行出错：{e}")
+        import traceback
+        st.code(traceback.format_exc())
