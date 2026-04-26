@@ -5,6 +5,15 @@
 import os
 
 import streamlit as st
+
+# st.set_page_config 必须是第一条 Streamlit 命令
+st.set_page_config(
+    page_title="职场修仙大护法",
+    page_icon="⚔️",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 from utils.config import APP_NAME, APP_VERSION, SCENES
 from utils.theme import (
     get_theme, set_theme, toggle_theme, is_xianxia,
@@ -79,19 +88,11 @@ def load_saved_config():
 
     # 加载历史记录
     load_history_from_storage()
-    
+
     st.session_state.config_loaded = True
 
 
 def main():
-    # 页面配置
-    st.set_page_config(
-        page_title=APP_NAME,
-        page_icon="⚔️",
-        layout="wide",
-        initial_sidebar_state="expanded",
-    )
-
     # 初始化
     init_session_state()
 
