@@ -132,22 +132,6 @@ deploy/
 
 ---
 
-## 📸 截图预览
-
-<!-- 修仙模式截图 -->
-| 修仙模式 | 职场模式 |
-|:---:|:---:|
-| ![修仙模式](screenshots/cultivation-mode.png) | ![职场模式](screenshots/workplace-mode.png) |
-
-<!-- 移动端截图 -->
-| 移动端适配 |
-|:---:|
-| ![移动端](screenshots/mobile-view.png) |
-
-> 📌 截图待补充，部署后可替换为实际截图。
-
----
-
 ## 📄 许可证
 
 本项目基于 [MIT License](LICENSE) 开源。
@@ -157,7 +141,7 @@ deploy/
 
 # 🧙‍♂️ Workplace Cultivation Guardian (职场修仙大护法)
 
-> Entry for TRAE × Maimai "AI Infinite Workplace" SOLO Challenge
+
 
 An AI-powered workplace survival tool wrapped in a cultivation (xianxia) game metaphor, helping workplace newcomers navigate various "tribulation" scenarios with ease.
 
@@ -287,21 +271,6 @@ deploy/
         └── team_leading.py      # Team leadership scenario
 ```
 
----
-
-## 📸 Screenshots
-
-<!-- Cultivation Mode Screenshot -->
-| Cultivation Mode | Workplace Mode |
-|:---:|:---:|
-| ![Cultivation Mode](screenshots/cultivation-mode.png) | ![Workplace Mode](screenshots/workplace-mode.png) |
-
-<!-- Mobile Screenshot -->
-| Mobile Responsive |
-|:---:|
-| ![Mobile View](screenshots/mobile-view.png) |
-
-> 📌 Screenshots to be added after deployment.
 
 ---
 
