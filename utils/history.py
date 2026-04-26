@@ -1,6 +1,7 @@
 """
 职场修仙大护法 - 历史记录管理
-通过 streamlit-js-eval 实现 localStorage 读写。
+通过 JS 注入实现 localStorage 读写。
+适配 Streamlit 1.56+（使用 st.iframe 替代已弃用的 st.components.v1.html）
 """
 
 import json
@@ -9,35 +10,44 @@ import streamlit as st
 from utils.config import STORAGE_KEY_HISTORY, STORAGE_KEY_CONFIG, STORAGE_KEY_THEME
 
 
-def _get_localstorage_js(code: str) -> str:
-    """生成调用 localStorage 的 JavaScript 代码"""
-    return f"""
-    <script>
-    function runLS() {{
-        try {{
-            {code}
-            window.parent.postMessage({{type: 'streamlit:setComponentValue', value: result}}, '*');
-        }} catch(e) {{
-            window.parent.postMessage({{type: 'streamlit:setComponentValue', value: null}}, '*');
-        }}
+def _inject_js(code: str):
+    """注入 JS 代码（不阻塞渲染，用于写入操作）"""
+    st.markdown(f"""
+    <script>{code}</script>
+    """, unsafe_allow_html=True)
+
+
+def _read_localstorage(key: str):
+    """从 localStorage 读取值（使用 st.iframe，适配 Streamlit 1.56+）"""
+    html = f"""
+    <html><body><script>
+    try {{
+        var val = localStorage.getItem('{key}');
+        window.parent.postMessage({{
+            type: 'streamlit:setComponentValue',
+            value: val
+        }}, '*');
+    }} catch(e) {{
+        window.parent.postMessage({{
+            type: 'streamlit:setComponentValue',
+            value: null
+        }}, '*');
     }}
-    runLS();
-    </script>
+    </script></body></html>
     """
+    return st.iframe(html, height=0)
 
 
 def save_config(api_url: str, api_key: str, model_name: str):
     """保存API配置到localStorage"""
     config = {"api_url": api_url, "api_key": api_key, "model_name": model_name}
     config_json = json.dumps(config, ensure_ascii=False)
-    js_code = f"var result = localStorage.setItem('{STORAGE_KEY_CONFIG}', '{config_json}');"
-    st.components.v1.html(_get_localstorage_js(js_code), height=0)
+    _inject_js(f"localStorage.setItem('{STORAGE_KEY_CONFIG}', '{config_json}');")
 
 
 def load_config():
     """从localStorage加载API配置"""
-    js_code = f"var result = localStorage.getItem('{STORAGE_KEY_CONFIG}');"
-    result = st.components.v1.html(_get_localstorage_js(js_code), height=0)
+    result = _read_localstorage(STORAGE_KEY_CONFIG)
     if result and isinstance(result, str):
         try:
             return json.loads(result)
@@ -48,14 +58,12 @@ def load_config():
 
 def save_theme(theme: str):
     """保存主题模式到localStorage"""
-    js_code = f"var result = localStorage.setItem('{STORAGE_KEY_THEME}', '{theme}');"
-    st.components.v1.html(_get_localstorage_js(js_code), height=0)
+    _inject_js(f"localStorage.setItem('{STORAGE_KEY_THEME}', '{theme}');")
 
 
 def load_theme():
     """从localStorage加载主题模式"""
-    js_code = f"var result = localStorage.getItem('{STORAGE_KEY_THEME}');"
-    result = st.components.v1.html(_get_localstorage_js(js_code), height=0)
+    result = _read_localstorage(STORAGE_KEY_THEME)
     if result and isinstance(result, str):
         return result
     return None
@@ -103,16 +111,14 @@ def _save_history(history: list):
             history = history[20:]
             history_json = json.dumps(history, ensure_ascii=False)
             st.session_state.history = history
-        js_code = f"var result = localStorage.setItem('{STORAGE_KEY_HISTORY}', '{history_json}');"
-        st.components.v1.html(_get_localstorage_js(js_code), height=0)
+        _inject_js(f"localStorage.setItem('{STORAGE_KEY_HISTORY}', '{history_json}');")
     except Exception:
         pass  # localStorage不可用时仅保存在session_state
 
 
 def load_history_from_storage():
     """从localStorage加载历史记录到session_state"""
-    js_code = f"var result = localStorage.getItem('{STORAGE_KEY_HISTORY}');"
-    result = st.components.v1.html(_get_localstorage_js(js_code), height=0)
+    result = _read_localstorage(STORAGE_KEY_HISTORY)
     if result and isinstance(result, str):
         try:
             history = json.loads(result)
@@ -132,8 +138,7 @@ def delete_history(record_id: int):
 def clear_history():
     """清空所有历史记录"""
     st.session_state.history = []
-    js_code = f"var result = localStorage.removeItem('{STORAGE_KEY_HISTORY}');"
-    st.components.v1.html(_get_localstorage_js(js_code), height=0)
+    _inject_js(f"localStorage.removeItem('{STORAGE_KEY_HISTORY}');")
 
 
 def toggle_star(record_id: int):

@@ -54,14 +54,6 @@ def load_saved_config():
         st.session_state.model_name = env_model_name
         st.session_state.env_config = True
 
-        # 自动测试连通性
-        from utils.api_client import test_connection
-        try:
-            success, message = test_connection(env_api_url, env_api_key, env_model_name)
-            st.session_state.api_online = success
-        except Exception:
-            st.session_state.api_online = False
-
         # 加载主题
         saved_theme = load_theme()
         if saved_theme in ("xianxia", "workplace"):

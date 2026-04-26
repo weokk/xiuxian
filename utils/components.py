@@ -69,8 +69,24 @@ def render_api_config_sidebar():
             st.session_state.api_key = api_key
             st.session_state.model_name = model_name
 
-            # 测试连接按钮
-            if st.button("🔗 测试连接", use_container_width=True):
+            # 首次自动测试连通性（不阻塞页面渲染）
+            if not st.session_state.get("api_tested"):
+                with st.spinner("正在检测 API 连通性..."):
+                    from utils.api_client import test_connection
+                    try:
+                        success, message = test_connection(api_url, api_key, model_name)
+                        st.session_state.api_online = success
+                        if success:
+                            st.success(f"✅ {message}")
+                        else:
+                            st.error(f"❌ {message}")
+                    except Exception as e:
+                        st.session_state.api_online = False
+                        st.error(f"❌ 连接检测失败：{str(e)[:80]}")
+                st.session_state.api_tested = True
+
+            # 手动重新测试按钮
+            if st.button("🔄 重新测试连接", use_container_width=True):
                 with st.spinner("正在测试连接..."):
                     from utils.api_client import test_connection
                     success, message = test_connection(api_url, api_key, model_name)
